@@ -28,6 +28,9 @@ export class RuleBasedScraper extends BaseScraper {
     // Check if it's a PDF config or has PDF rules
     if (this.isPdfConfig(config)) return true;
 
+    // Check if it's a SPA config
+    if (this.isSpaConfig(config)) return true;
+
     // Check if it's a web config with selectors
     return config.selectors !== undefined;
     // return ConfigManager.isPdfUrl(url);
@@ -45,6 +48,13 @@ export class RuleBasedScraper extends BaseScraper {
     if (configKey?.startsWith("pdf:")) return true;
 
     return false;
+  }
+
+  private isSpaConfig(config: EnhancedScrapingRules): boolean {
+    // Check if config key starts with "spa:"
+    if (config.spaRules) return true;
+    const configKey = this.getConfigKey(config);
+    return configKey?.startsWith("spa:") || false;
   }
 
   private getConfigKey(config: EnhancedScrapingRules): string | null {
@@ -118,6 +128,13 @@ export class RuleBasedScraper extends BaseScraper {
     // Use existing web scraping logic
     if (!config.selectors) {
       throw new Error(`Missing selectors in config for URL: ${url}`);
+    }
+
+    if (this.isSpaConfig(config)) {
+      Logger.info(
+        `[EnhancedRuleBasedScraper] Detected SPA site, using SPA scraping method`
+      );
+      return this.scrapeListPageSPA(url, userId, config);
     }
 
     if (this.isArticleUrl(url, config)) {
@@ -305,6 +322,116 @@ export class RuleBasedScraper extends BaseScraper {
     } finally {
       await browser.close();
     }
+  }
+
+  private async scrapeListPageSPA(
+    url: string,
+    userId: string,
+    config: any
+  ): Promise<ContentItem[]> {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    try {
+      const page = await browser.newPage();
+
+      if (config.behavior.userAgent) {
+        await page.setUserAgent(config.behavior.userAgent);
+      }
+
+      Logger.info(`[SPA] Navigating to SPA listing page: ${url}`);
+      await page.goto(url, { waitUntil: "networkidle2" });
+
+      // Phase 1: Collect all article URLs by clicking
+      const articleUrls = await this.collectSpaArticleUrls(page, config);
+      Logger.info(`[SPA] Collected ${articleUrls.length} article URLs`);
+
+      // Phase 2: Scrape each article individually
+      const allItems: ContentItem[] = [];
+
+      for (let i = 0; i < articleUrls.length; i++) {
+        const articleUrl = articleUrls[i];
+        try {
+          Logger.info(
+            `[SPA] Scraping article ${i + 1}/${
+              articleUrls.length
+            }: ${articleUrl}`
+          );
+
+          const items = await this.scrapeSinglePage(articleUrl, userId, config);
+          allItems.push(...items);
+
+          await new Promise((resolve) =>
+            setTimeout(resolve, config.behavior.delayBetweenRequests)
+          );
+        } catch (error) {
+          Logger.error(`[SPA] Failed to scrape article ${articleUrl}`, error);
+        }
+      }
+
+      return allItems;
+    } finally {
+      await browser.close();
+    }
+  }
+
+  private async collectSpaArticleUrls(
+    page: any,
+    config: any
+  ): Promise<string[]> {
+    Logger.info(`[SPA] Collecting article URLs by clicking buttons`);
+    const urls: string[] = [];
+    const listingUrl = page.url();
+
+    try {
+      // Count total buttons first
+      const totalButtons = await page.$$eval(
+        config.selectors.articleLinks[0], // Should be 'button:contains("Read more")'
+        (buttons: Element[]) => buttons.length
+      );
+
+      Logger.info(`[SPA] Found ${totalButtons} buttons to process`);
+
+      for (let i = 0; i < totalButtons; i++) {
+        try {
+          // Always start fresh from listing page
+          if (page.url() !== listingUrl) {
+            await page.goto(listingUrl, { waitUntil: "networkidle2" });
+            await page.waitForSelector(config.selectors.articleLinks[0], {
+              timeout: 5000,
+            });
+          }
+
+          // Get fresh button references
+          const buttons = await page.$$(config.selectors.articleLinks[0]);
+
+          if (i < buttons.length) {
+            Logger.info(`[SPA] Processing article ${i + 1}/${totalButtons}`);
+
+            await buttons[i].click();
+            await page.waitForNavigation({
+              waitUntil: "networkidle2",
+              timeout: 10000,
+            });
+
+            const articleUrl = page.url();
+            if (config.selectors.urlPatterns.articlePattern.test(articleUrl)) {
+              urls.push(articleUrl);
+              Logger.info(`[SPA] ✓ Collected: ${articleUrl}`);
+            }
+          }
+        } catch (error) {
+          Logger.error(`[SPA] Failed to collect article ${i + 1}:`, error);
+        }
+      }
+    } catch (error) {
+      Logger.error("[SPA] Error in URL collection:", error);
+    }
+
+    Logger.info(`[SPA] Collection complete: ${urls.length} URLs collected`);
+    return [...new Set(urls)]; // Remove duplicates
   }
 
   // Include other helper methods...
