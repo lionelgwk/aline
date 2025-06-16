@@ -1,5 +1,5 @@
 import { EnhancedScrapingRules } from "../../types";
-import { CommonProcessors } from "../../utils";
+import { CommonProcessors } from "../../processors";
 
 export const InterviewingIOBlogConfig: EnhancedScrapingRules = {
   domain: "interviewing.io",
