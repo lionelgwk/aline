@@ -1,7 +1,8 @@
 import { ContentType } from ".";
 
-// extended to include pdf format
+// extended to include pdf and spa rules
 export interface EnhancedScrapingRules extends ScrapingRules {
+  spaRules?: SPAScrapingRules;
   pdfRules?: PDFScrapingRules;
   contentDetection?: {
     isPdf?: boolean;
@@ -83,4 +84,9 @@ export interface PDFScrapingRules {
     minTitleLength: number;
     maxTitleLength: number;
   };
+}
+
+export interface SPAScrapingRules {
+  buttonSelector: string;
+  waitAfterClick: number;
 }

@@ -5,12 +5,25 @@ export const CommonProcessors = {
     const match = rawText.match(/^By\s+(.+?)\s+\|/);
     return match ? match[1].trim() : rawText.trim();
   },
+
+  getQuillBlogAuthorName(rawText: string): string {
+    if (!rawText) return "";
+
+    // Split on the dot (·) and take the first part
+    const parts = rawText.split("·");
+    if (parts.length > 0) {
+      return parts[0].trim();
+    }
+
+    // If no separators found, return cleaned text 
+    return rawText.trim();
+  },
+
   removeInterviewingIONestedNav: (rawHtml: string): string => {
     // Remove nav tag
     return rawHtml.replace(/<nav\b[^>]*>.*?<\/nav>/gis, "");
   },
 
-  // Content processors
   cleanInterviewingIOContent: (rawText: string): string => {
     return rawText
       .replace(/\n\s*\n\s*\n/g, "\n\n") // Remove excessive newlines

@@ -4,6 +4,7 @@ import {
   InterviewingIOTopicsConfig,
   InterviewingIOLearnConfig,
   NilMamanoBlogDSAConfig,
+  QuillBlogConfig,
 } from "./web";
 import { BTCTIConfig, GenericConfig } from "./pdf";
 
@@ -17,4 +18,6 @@ export const ENHANCED_SCRAPER_CONFIGS: Record<string, EnhancedScrapingRules> = {
   // PDF Specific Configs
   "pdf:bctci": BTCTIConfig,
   "pdf:generic": GenericConfig,
+  // SPA Specific Configs
+  "spa:quill.co/blog": QuillBlogConfig,
 };
