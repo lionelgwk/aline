@@ -33,7 +33,6 @@ export class RuleBasedScraper extends BaseScraper {
 
     // Check if it's a web config with selectors
     return config.selectors !== undefined;
-    // return ConfigManager.isPdfUrl(url);
   }
 
   private isPdfConfig(config: EnhancedScrapingRules): boolean {
@@ -58,8 +57,6 @@ export class RuleBasedScraper extends BaseScraper {
   }
 
   private getConfigKey(config: EnhancedScrapingRules): string | null {
-    // Helper to find the config key - you might need to enhance ConfigManager for this
-    // For now, we'll use the domain as a fallback
     return config.domain || null;
   }
 
@@ -294,7 +291,7 @@ export class RuleBasedScraper extends BaseScraper {
 
       const processedContent =
         this.contentProcessor.processContent(contentHtml);
-      debugSaver.save(processedContent, `converted-${title}.md`);
+      // debugSaver.save(processedContent, `converted-${title}.md`); // NOTE: uncomment this to save and see the converted content in a markdown file under temp/
 
       let cleanedContent = processedContent;
       config.processing.cleanupRules.replacePatterns.forEach((rule) => {
@@ -434,7 +431,6 @@ export class RuleBasedScraper extends BaseScraper {
     return [...new Set(urls)]; // Remove duplicates
   }
 
-  // Include other helper methods...
   private async findMaxPage(page: any, config: ScrapingRules): Promise<number> {
     if (!config.selectors) throw new Error(`Missing selectors in config`);
 

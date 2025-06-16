@@ -15,7 +15,7 @@ export const GenericConfig: EnhancedScrapingRules = {
       /page\s+\d+/gi,
       /^\d+$/gm, // Remove standalone page numbers
     ],
-    minWordCount: 100,
+    minWordCount: 10,
     cleanReplacePatterns: [
       { pattern: /\f/g, replacement: "\n" },
       { pattern: /\n{3,}/g, replacement: "\n\n" },

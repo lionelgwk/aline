@@ -62,7 +62,10 @@ export class ConfigurablePDFScraper {
       if (downloadedFilePath) await this.cleanup([downloadedFilePath]);
       return items;
     } catch (error) {
-      Logger.error(`[ConfigurablePDFScraper] Failed to process PDF: ${url}`, error);
+      Logger.error(
+        `[ConfigurablePDFScraper] Failed to process PDF: ${url}`,
+        error
+      );
       return [];
     }
   }
@@ -243,12 +246,12 @@ export class ConfigurablePDFScraper {
       return false;
     }
 
-    // Default validation (300 words) if no config
+    // Default validation (10 words) if no config
     if (!this.config.pdfRules && !this.config.processing) {
       const wordCount = item.content.split(/\s+/).length;
-      if (wordCount < 50) {
+      if (wordCount < 10) {
         Logger.warn(
-          `[ConfigurablePDFScraper] Item "${item.title}" below default word count: ${wordCount} < 50`
+          `[ConfigurablePDFScraper] Item "${item.title}" below default word count: ${wordCount} < 10`
         );
         return false;
       }
@@ -316,7 +319,10 @@ export class ConfigurablePDFScraper {
           await fs.remove(filePath);
         }
       } catch (error) {
-        Logger.warn(`[ConfigurablePDFScraper] Failed to delete ${filePath}`, error);
+        Logger.warn(
+          `[ConfigurablePDFScraper] Failed to delete ${filePath}`,
+          error
+        );
       }
     }
   }

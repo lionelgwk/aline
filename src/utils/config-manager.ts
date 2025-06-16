@@ -96,7 +96,6 @@ export class ConfigManager {
   // Method to set default PDF config
   static setDefaultPdfConfig(configKey: string): void {
     if (ENHANCED_SCRAPER_CONFIGS[configKey]) {
-      // Note: In a real implementation, you'd want to make this mutable
       console.log(
         `[ConfigManager] Would set default PDF config to: ${configKey}`
       );
