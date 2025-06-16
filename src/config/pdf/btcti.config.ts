@@ -7,18 +7,17 @@ export const BTCTIConfig: EnhancedScrapingRules = {
   // Mark this as a PDF configuration
   contentDetection: {
     isPdf: true,
-    autoDetect: false, // Don't auto-detect, explicitly handle BCTCI PDFs
+    autoDetect: false,
   },
 
-  // PDF-specific rules extracted from your current PDFScraper
   pdfRules: {
     chapterPattern: /^chapter\s+\d+$/i,
     ignorePatterns: [
-      /CHAPTER\s+\d+\s+▸.+?\d{1,3}/gi, // Remove running headers
-      /^[A-Z\s]{8,50}$/gm, // Remove large all-caps lines
-      /bctci\.co\S*/gi, // Remove marketing footers
+      /CHAPTER\s+\d+\s+▸.+?\d{1,3}/gi,
+      /^[A-Z\s]{8,50}$/gm,
+      /bctci\.co\S*/gi,
     ],
-    minWordCount: 300,
+    minWordCount: 10,
     cleanReplacePatterns: [
       { pattern: /\f/g, replacement: "\n" },
       { pattern: /\r\n|\r/g, replacement: "\n" },
@@ -46,7 +45,7 @@ export const BTCTIConfig: EnhancedScrapingRules = {
   },
 
   processing: {
-    minContentLength: 300,
+    minContentLength: 10,
     cleanupRules: {
       removeSelectors: [], // Not applicable for PDFs
       replacePatterns: [
