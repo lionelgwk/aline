@@ -14,6 +14,8 @@ async function main() {
     // PDF sources
     "https://drive.google.com/file/d/1aLUbg2Hif1zG2TcN_ldVQZbygcvtW9Hr/view",
     "https://drive.google.com/file/d/1khcqC5NvkefOmG9pAEPIopT9Vi6cUk_4/view",
+    // SPA sources
+    "https://quill.co/blog",
   ];
 
   try {
