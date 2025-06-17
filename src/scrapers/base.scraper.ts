@@ -4,7 +4,6 @@ export abstract class BaseScraper {
   abstract canHandle(url: string): boolean;
   abstract scrape(url: string, userId?: string): Promise<ContentItem[]>;
 
-
   protected cleanText(text: string): string {
     return text
       .replace(/\s+/g, " ")
@@ -14,7 +13,7 @@ export abstract class BaseScraper {
 
   protected extractDomain(url: string): string {
     try {
-      return new URL(url).hostname;
+      return new URL(url).hostname.toLowerCase();
     } catch {
       return "";
     }
