@@ -20,6 +20,7 @@ export const InterviewingIOLearnConfig: EnhancedScrapingRules = {
       },
       { selector: ".guide-author" },
     ],
+    defaultAuthor: "",
 
     pagination: {
       pageLinks: [],

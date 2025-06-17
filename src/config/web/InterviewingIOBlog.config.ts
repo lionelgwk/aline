@@ -14,6 +14,7 @@ export const InterviewingIOBlogConfig: EnhancedScrapingRules = {
         processor: CommonProcessors.getInterviewingIOBlogAuthor,
       },
     ],
+    defaultAuthor: "",
 
     pagination: {
       pageLinks: ['a[href*="/blog/page/"]'],

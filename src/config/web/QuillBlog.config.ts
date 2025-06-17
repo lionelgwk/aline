@@ -24,7 +24,7 @@ export const QuillBlogConfig: EnhancedScrapingRules = {
         processor: CommonProcessors.getQuillBlogAuthorName,
       },
     ],
-
+    defaultAuthor: "",
     pagination: {
       pageLinks: [],
       nextButton: [],
@@ -49,9 +49,12 @@ export const QuillBlogConfig: EnhancedScrapingRules = {
     },
   },
 
-  spaRules: {
+  spaConfig: {
+    collectionMethod: "click-through",
     buttonSelector: "button.text-slate-700.font-semibold.text-sm",
     waitAfterClick: 2000,
+    preActions: [],
+    enableLazyLoading: false,
   },
 
   behavior: {

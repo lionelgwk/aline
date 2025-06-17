@@ -2,7 +2,7 @@ import { ContentType } from ".";
 
 // extended to include pdf and spa rules
 export interface EnhancedScrapingRules extends ScrapingRules {
-  spaRules?: SPAScrapingRules;
+  spaConfig?: SPAScrapingRules;
   pdfRules?: PDFScrapingRules;
   contentDetection?: {
     isPdf?: boolean;
@@ -41,6 +41,7 @@ export interface SelectorConfig {
   title: SelectorWithProcessor[];
   content: SelectorWithProcessor[];
   author: SelectorWithProcessor[];
+  defaultAuthor: string;
 
   // Pagination selectors
   pagination: {
@@ -87,6 +88,29 @@ export interface PDFScrapingRules {
 }
 
 export interface SPAScrapingRules {
+  collectionMethod: "click-through" | "extract-links";
   buttonSelector: string;
   waitAfterClick: number;
+
+  // Pre-actions (click "No thanks", "See all", etc.)
+  preActions?: SPAAction[];
+
+  // Lazy loading support for infinite scroll
+  enableLazyLoading?: boolean;
+  lazyLoadConfig?: {
+    maxScrollAttempts?: number;
+    scrollDelay?: number;
+    stopCondition?: "no-new-links" | "max-attempts" | "timeout";
+  };
+}
+
+export interface SPAAction {
+  action: "click" | "wait" | "scroll";
+  selector?: string;
+  waitFor?: string | number; // Selector to wait for, or milliseconds to wait
+  timeout?: number;
+  optional?: boolean; // If true, don't fail if element not found
+  description?: string; // For logging
+  scrollBehavior?: "smooth" | "auto"; // For scroll actions
+  scrollDirection?: "down" | "up" | "bottom"; // For scroll actions
 }

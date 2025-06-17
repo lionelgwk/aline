@@ -5,6 +5,7 @@ import {
   InterviewingIOLearnConfig,
   NilMamanoBlogDSAConfig,
   QuillBlogConfig,
+  SubstackBlogConfig,
 } from "./web";
 import { BTCTIConfig, GenericConfig } from "./pdf";
 
@@ -20,4 +21,5 @@ export const ENHANCED_SCRAPER_CONFIGS: Record<string, EnhancedScrapingRules> = {
   "pdf:generic": GenericConfig,
   // SPA Specific Configs
   "spa:quill.co/blog": QuillBlogConfig,
+  "spa:substack.com": SubstackBlogConfig,
 };

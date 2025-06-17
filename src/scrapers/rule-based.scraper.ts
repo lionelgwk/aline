@@ -1,4 +1,4 @@
-import { BaseScraper, ConfigurablePDFScraper } from ".";
+import { BaseScraper, ConfigurablePDFScraper, SPAScraper } from ".";
 import { ContentProcessor } from "../processors";
 import { ConfigManager } from "../utils";
 import { EnhancedScrapingRules } from "../types";
@@ -51,7 +51,7 @@ export class RuleBasedScraper extends BaseScraper {
 
   private isSpaConfig(config: EnhancedScrapingRules): boolean {
     // Check if config key starts with "spa:"
-    if (config.spaRules) return true;
+    if (config.spaConfig) return true;
     const configKey = this.getConfigKey(config);
     return configKey?.startsWith("spa:") || false;
   }
@@ -127,11 +127,13 @@ export class RuleBasedScraper extends BaseScraper {
       throw new Error(`Missing selectors in config for URL: ${url}`);
     }
 
+    const spaScraper = new SPAScraper();
+
     if (this.isSpaConfig(config)) {
       Logger.info(
         `[EnhancedRuleBasedScraper] Detected SPA site, using SPA scraping method`
       );
-      return this.scrapeListPageSPA(url, userId, config);
+      return spaScraper.scrape(url, userId, config);
     }
 
     if (this.isArticleUrl(url, config)) {
@@ -240,7 +242,7 @@ export class RuleBasedScraper extends BaseScraper {
     }
   }
 
-  private async scrapeSinglePage(
+  public async scrapeSinglePage(
     url: string,
     userId: string,
     config: ScrapingRules
@@ -286,7 +288,7 @@ export class RuleBasedScraper extends BaseScraper {
         $,
         config.selectors.author,
         false,
-        ""
+        config.selectors.defaultAuthor
       );
 
       const processedContent =

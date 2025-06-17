@@ -54,7 +54,7 @@ export class ConfigurablePDFScraper {
           content: this.cleanContentWithConfig(chapter.content),
           content_type: this.config.behavior?.contentType || "book",
           source_url: url,
-          author: "Aline", // Could be configurable
+          author: "",
           user_id: userId,
         }))
         .filter((item) => this.validateItemWithConfig(item));
