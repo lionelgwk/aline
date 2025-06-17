@@ -16,6 +16,8 @@ async function main() {
     "https://drive.google.com/file/d/1khcqC5NvkefOmG9pAEPIopT9Vi6cUk_4/view",
     // SPA sources
     "https://quill.co/blog",
+    // Bonus
+    "https://shreycation.substack.com",
   ];
 
   try {
