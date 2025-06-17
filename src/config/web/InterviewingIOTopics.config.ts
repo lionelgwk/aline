@@ -18,6 +18,7 @@ export const InterviewingIOTopicsConfig: EnhancedScrapingRules = {
       },
     ],
     author: [],
+    defaultAuthor: "",
 
     pagination: {
       pageLinks: [], // No pagination for company listing

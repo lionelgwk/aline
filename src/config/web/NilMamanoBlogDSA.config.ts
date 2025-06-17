@@ -14,6 +14,7 @@ export const NilMamanoBlogDSAConfig: EnhancedScrapingRules = {
         processor: CommonProcessors.getInterviewingIOBlogAuthor,
       },
     ],
+    defaultAuthor: "Nil Mamano",
 
     pagination: {
       pageLinks: [], // No pagination for Nil Mamano's DSA category
