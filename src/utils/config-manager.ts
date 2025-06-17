@@ -13,50 +13,61 @@ const PDF_URL_MAPPINGS: Record<string, string> = {
 };
 
 export class ConfigManager {
-  static getConfigForUrl(url: string): EnhancedScrapingRules | null {
-    const preferredPdfConfig = PDF_URL_MAPPINGS[url];
-    console.log(`[ConfigManager] Looking for config for URL: ${url}`);
+  static extractDomain(url: string): string {
+    try {
+      return new URL(url).hostname.toLowerCase();
+    } catch {
+      return "";
+    }
+  }
 
-    if (preferredPdfConfig) {
-      console.log(
-        `[ConfigManager] Found mapped PDF config: ${preferredPdfConfig}`
-      );
+  static getConfigForUrl(url: string): EnhancedScrapingRules | null {
+    const preferredConfig = PDF_URL_MAPPINGS[url];
+
+    if (preferredConfig) {
+      return ENHANCED_SCRAPER_CONFIGS[preferredConfig];
     }
 
     if (this.isPdfUrl(url)) {
-      console.log(`[ConfigManager] Detected PDF URL`);
-
-      // If we have a specific mapping for this URL, use it
-      if (preferredPdfConfig && ENHANCED_SCRAPER_CONFIGS[preferredPdfConfig]) {
-        console.log(
-          `[ConfigManager] Using mapped PDF config: ${preferredPdfConfig}`
-        );
-        return ENHANCED_SCRAPER_CONFIGS[preferredPdfConfig];
-      }
-
-      // Fall back to default PDF config
-      console.log(
-        `[ConfigManager] Using default PDF config: ${DEFAULT_PDF_CONFIG}`
-      );
       return ENHANCED_SCRAPER_CONFIGS[DEFAULT_PDF_CONFIG];
     }
 
-    // For web URLs, check exact matches first
+    // Extract domain using existing base scraper method
+    const domain = ConfigManager.extractDomain(url);
+    console.log(`[ConfigManager] Extracted domain: ${domain} from URL: ${url}`);
+
+    // Check for exact matches first (like "interviewing.io/topics")
     for (const [key, config] of Object.entries(ENHANCED_SCRAPER_CONFIGS)) {
-      if (key.startsWith("pdf:")) continue; // Skip PDF configs for web URLs
+      if (key.startsWith("pdf:") || key.startsWith("spa:")) continue;
 
       if (url.includes(key)) {
-        console.log(`[ConfigManager] Found exact match for key: ${key}`);
+        console.log(`[ConfigManager] Found exact path match: ${key}`);
         return config;
       }
     }
 
-    // Check domain matches for web configs
+    // Check for SPA configs
     for (const [key, config] of Object.entries(ENHANCED_SCRAPER_CONFIGS)) {
-      if (key.startsWith("pdf:")) continue; // Skip PDF configs
+      if (key.startsWith("spa:")) {
+        const configDomain = key.replace("spa:", "").split("/")[0];
+        // Check if extracted domain ends with the config domain
+        if (domain.endsWith(configDomain)) {
+          console.log(
+            `[ConfigManager] Found SPA domain match: ${key} for domain: ${domain}`
+          );
+          return config;
+        }
+      }
+    }
 
-      if (config.domain && url.includes(config.domain)) {
-        console.log(`[ConfigManager] Found domain match for: ${config.domain}`);
+    // Domain matching for regular web configs (fallback)
+    for (const [key, config] of Object.entries(ENHANCED_SCRAPER_CONFIGS)) {
+      if (key.startsWith("pdf:") || key.startsWith("spa:")) continue;
+
+      if (config.domain && domain.includes(config.domain)) {
+        console.log(
+          `[ConfigManager] Found domain fallback match: ${config.domain}`
+        );
         return config;
       }
     }
